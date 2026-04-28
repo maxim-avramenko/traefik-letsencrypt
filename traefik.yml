@@ -1,0 +1,35 @@
+# Traefik 3.6: ACME_EMAIL из env контейнера (docker-compose).
+# Docker provider берёт адрес контейнера из общей сети traefik.
+
+api:
+  dashboard: true
+  insecure: true
+
+log:
+  level: INFO
+
+accessLog: {}
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "${ACME_EMAIL}"
+      storage: /letsencrypt/acme.json
+      httpChallenge:
+        entryPoint: web
+
+providers:
+  docker:
+    exposedByDefault: false
+    network: traefik
